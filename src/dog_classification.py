@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 
 import argh
-import os
+
+from image_classifier import ImageClassifier
+
 
 
 
 @argh.arg('--train-data', help='Train data dir', type=str, required=True)
 def main(**kwargs):
-    print kwargs['train_data']
+    classifier = ImageClassifier(train_dir=kwargs['train_data'])
+    classifier.train()
+    classifier.test()
 
 
 
