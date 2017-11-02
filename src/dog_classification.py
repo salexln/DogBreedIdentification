@@ -8,8 +8,9 @@ from image_classifier import ImageClassifier
 
 
 @argh.arg('--train-data', help='Train data dir', type=str, required=True)
+@argh.arg('--labels', help='Path to labels file for train dataset', type=str, required=True)
 def main(**kwargs):
-    classifier = ImageClassifier(train_dir=kwargs['train_data'])
+    classifier = ImageClassifier(train_dir=kwargs['train_data'], labels=kwargs['labels'])
     classifier.train()
     classifier.test()
 
