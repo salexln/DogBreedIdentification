@@ -6,12 +6,15 @@ from sklearn.neighbors import KNeighborsClassifier
 
 class ImageClassifier(object):
 
-    def __init__(self, train_dir, labels):
+    def __init__(self, train_dir, labels, test_dir):
         self._train_dir = train_dir
         self._labels_path = labels
         self._train_data = {}
         self._train_labels = []
         self._train_features = []
+        self._model = None
+        self._test_dir = test_dir
+        self._test_data = {}
 
     # def _image_to_rgb(self, image):
     #     rgb = misc.imread(image)
@@ -38,7 +41,6 @@ class ImageClassifier(object):
             self._train_features.append(v['data'])
             self._train_labels.append(v['label'])
 
-
     def _prepare_data(self):
         files = os.listdir(self._train_dir)
         for data_file in files:
@@ -51,15 +53,37 @@ class ImageClassifier(object):
 
         self._get_data_and_labels()
 
+    def _prepare_test_data(self):
+        files = os.listdir(self._test_dir)
+        for data_file in files:
+            # import pdb; pdb.set_trace()
+            try:
+                features = self._image_to_feature_vector(image_path=os.path.join(self._test_dir, data_file))
+                file_name = data_file.split('.')[0]
+                self._test_data[file_name] = {}
+                self._test_data[file_name]['data'] = features
+            except:
+                pass
+
     def train(self):
         print 'Training'
         self._prepare_data()
+        self._run_knn()
 
     def _run_knn(self):
-        neigh = KNeighborsClassifier(n_neighbors=3)
-        neigh.fit(self._train_features, self._train_labels)
+        self._model = KNeighborsClassifier(n_neighbors=3)
+        self._model.fit(self._train_features, self._train_labels)
 
 
     def test(self):
         print 'Testing'
-        self._run_knn()
+        self._prepare_test_data()
+
+        test_features = []
+        for k, v in self._test_data.iteritems():
+            test_features.append(v['data'])
+
+            self._predictions = self._model.predict(test_features)
+
+    def print_results(self):
+        print self._predictions
